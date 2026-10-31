@@ -1,5 +1,7 @@
 # 21-Card Trick
 
+[**Play the 21-Card Trick**](https://ramui.github.io/21_Card_Trick/)
+
 A browser-based card trick that appears to identify one of 21 randomly selected playing cards. The player silently remembers a card, then points out its pile in each of three rounds. After collecting each selected pile between the other two piles, the program reveals the 11th card.
 
 ## Browser Version
