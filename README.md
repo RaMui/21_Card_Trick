@@ -1,21 +1,12 @@
 # 21-Card Trick
 
-A Python command-line card trick that appears to identify one of 21 randomly selected playing cards. The player silently remembers a card, then points out its pile in each of three rounds. After collecting each selected pile between the other two piles, the program reveals the 11th card.
-
-## Requirements
-
-- Python 3
-- No third-party packages are required.
-
-## Run
-
-```bash
-python 21_Card_Trick.py
-```
+A browser-based card trick that appears to identify one of 21 randomly selected playing cards. The player silently remembers a card, then points out its pile in each of three rounds. After collecting each selected pile between the other two piles, the program reveals the 11th card.
 
 ## Browser Version
 
 Open `h5/index.html` in a modern browser to play the responsive H5 version. It uses vanilla JavaScript and inline SVG card faces, with no build step or external dependencies.
+
+The core card-trick logic is based on the `python_version` branch; this version adds a front-end interface to demonstrate the trick in the browser.
 
 ## How to Play
 
@@ -25,7 +16,6 @@ Open `h5/index.html` in a modern browser to play the responsive H5 version. It u
 
 ## Project File
 
-- `21_Card_Trick.py` — creates the deck, deals the cards, and reveals the result.
 - `h5/` — browser version of the trick (`index.html`, `styles.css`, and `app.js`).
 
 ## How It Works
