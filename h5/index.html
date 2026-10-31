@@ -78,11 +78,11 @@
             <div>
               <p class="eyebrow"><span class="eyebrow-line"></span> THE FINAL COUNT</p>
               <h2>One card at a time.</h2>
-              <p class="game-instruction">After three rounds, your card is waiting in the middle.</p>
+              <p class="game-instruction">All 21 cards will turn face up. Your card is the one in the middle.</p>
             </div>
             <div class="round-meter" aria-label="Cards counted">
               <span class="round-number" id="count-current">00</span>
-              <span class="round-total">/ 11</span>
+              <span class="round-total">/ 21</span>
             </div>
           </div>
 
@@ -90,8 +90,8 @@
             <span class="progress-fill" id="count-progress-fill"></span>
           </div>
 
-          <div class="count-grid" id="count-grid" role="list" aria-label="Counting the first eleven cards"></div>
-          <p class="live-message" id="count-status" aria-live="polite">Shuffling the cards into order…</p>
+          <div class="count-grid" id="count-grid" role="list" aria-label="Revealing all twenty-one cards"></div>
+          <p class="live-message" id="count-status" aria-live="polite">Turning over all 21 cards…</p>
         </section>
 
         <section class="play-surface reveal-panel" id="reveal-panel" aria-live="polite" hidden>
@@ -114,4 +114,3 @@
     </div>
   </body>
 </html>
-

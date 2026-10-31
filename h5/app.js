@@ -82,8 +82,8 @@ function createCardSvg(card) {
     "text-anchor": "middle",
   });
   corner.append(
-    makeSvgElement("text", { x: "19", y: "25", "font-size": "19" }, card.rank),
-    makeSvgElement("text", { x: "19", y: "44", "font-size": "16" }, card.suit),
+    makeSvgElement("text", { class: "card-rank", x: "19", y: "25", "font-size": "19" }, card.rank),
+    makeSvgElement("text", { class: "card-suit", x: "19", y: "44", "font-size": "16" }, card.suit),
   );
   svg.append(corner);
 
@@ -95,8 +95,8 @@ function createCardSvg(card) {
     transform: "rotate(180 60 82)",
   });
   bottomCorner.append(
-    makeSvgElement("text", { x: "19", y: "25", "font-size": "19" }, card.rank),
-    makeSvgElement("text", { x: "19", y: "44", "font-size": "16" }, card.suit),
+    makeSvgElement("text", { class: "card-rank", x: "19", y: "25", "font-size": "19" }, card.rank),
+    makeSvgElement("text", { class: "card-suit", x: "19", y: "44", "font-size": "16" }, card.suit),
   );
   svg.append(bottomCorner);
 
@@ -106,6 +106,7 @@ function createCardSvg(card) {
       makeSvgElement(
         "text",
         {
+          class: "card-rank",
           x: "60",
           y: "86",
           fill: card.color,
@@ -120,6 +121,7 @@ function createCardSvg(card) {
       makeSvgElement(
         "text",
         {
+          class: "card-suit",
           x: "60",
           y: "121",
           fill: card.color,
@@ -136,6 +138,7 @@ function createCardSvg(card) {
       makeSvgElement(
         "text",
         {
+          class: "card-suit",
           x: "60",
           y: "91",
           fill: card.color,
@@ -156,6 +159,13 @@ function dealCards(cards) {
   const piles = [[], [], []];
   cards.forEach((card, index) => piles[index % 3].push(card));
   return piles;
+}
+
+function collectPileInMiddle(pileIndex) {
+  const piles = dealCards(deck);
+  const selectedPile = piles[pileIndex];
+  const otherPiles = piles.filter((_, index) => index !== pileIndex);
+  deck = [...otherPiles[0], ...selectedPile, ...otherPiles[1]];
 }
 
 function renderCard(card, className = "card-slot") {
@@ -208,7 +218,7 @@ function renderHeroCards() {
   samples.forEach((card) => heroCards.append(renderCard(card, "hero-card")));
 }
 
-function renderRound({ animateDeal = false, countAfterDeal = false } = {}) {
+function renderRound({ animateDeal = false } = {}) {
   const piles = dealCards(deck);
   if (dealTimer !== null) {
     window.clearTimeout(dealTimer);
@@ -216,24 +226,17 @@ function renderRound({ animateDeal = false, countAfterDeal = false } = {}) {
   }
   pileBoard.classList.remove("is-gathering", "is-shuffling", "is-dealing");
   roundKicker.textContent = `ROUND ${round} OF 3`;
-  gameTitle.textContent = countAfterDeal
-    ? "The deck is back in three piles."
-    : "Which pile holds your card?";
-  gameInstruction.textContent = countAfterDeal
-    ? "Now we’ll count to the card in the middle."
-    : "Find your card, then choose its pile.";
+  gameTitle.textContent = "Which pile holds your card?";
+  gameInstruction.textContent = "Find your card, then choose its pile.";
   roundNumber.textContent = String(round).padStart(2, "0");
   progressFill.style.width = `${(round / 3) * 100}%`;
-  liveMessage.textContent = countAfterDeal
-    ? "The three piles are dealt. Counting starts in a moment…"
-    : "Your card is in one of these piles. Take a good look.";
+  liveMessage.textContent = "Your card is in one of these piles. Take a good look.";
   pileBoard.replaceChildren();
 
   piles.forEach((pile, pileIndex) => {
     const button = document.createElement("button");
     button.type = "button";
     button.className = "pile-choice";
-    button.disabled = countAfterDeal;
     button.setAttribute(
       "aria-label",
       `Pile ${pileIndex + 1}: ${pile.map((card) => `${card.rank}${card.suit}`).join(", ")}`,
@@ -268,6 +271,7 @@ function choosePile(pileIndex) {
     window.clearTimeout(dealTimer);
     dealTimer = null;
   }
+
   isGathering = true;
   pileBoard.classList.remove("is-dealing");
   pileBoard.classList.add("is-gathering");
@@ -287,15 +291,11 @@ function choosePile(pileIndex) {
 
     shuffleTimer = window.setTimeout(() => {
       shuffleTimer = null;
-      const piles = dealCards(deck);
-      const selectedPile = piles[pileIndex];
-      const otherPiles = piles.filter((_, index) => index !== pileIndex);
-      deck = [...otherPiles[0], ...selectedPile, ...otherPiles[1]];
+      collectPileInMiddle(pileIndex);
 
       if (round === 3) {
         isGathering = false;
-        renderRound({ animateDeal: true, countAfterDeal: true });
-        countTimers.push(window.setTimeout(startCounting, 1050));
+        startCounting();
         return;
       }
 
@@ -327,27 +327,32 @@ function startCounting() {
   countPanel.hidden = false;
   restartButton.hidden = false;
 
-  const firstEleven = deck.slice(0, 11);
-  countGrid.replaceChildren(...firstEleven.map(renderCountCard));
+  const allCards = deck.slice(0, 21);
+  countGrid.replaceChildren(...allCards.map(renderCountCard));
   countCurrent.textContent = "00";
   countProgressFill.style.width = "0%";
-  countStatus.textContent = "Counting the cards to find the one in the middle…";
+  countStatus.textContent = "Turning over all 21 cards…";
   countPanel.scrollIntoView({ behavior: "smooth", block: "start" });
 
-  firstEleven.forEach((_, index) => {
+  allCards.forEach((_, index) => {
     const timer = window.setTimeout(() => {
       const item = countGrid.children[index];
       item.classList.add("is-counted");
       countCurrent.textContent = String(index + 1).padStart(2, "0");
-      countProgressFill.style.width = `${((index + 1) / 11) * 100}%`;
-      countStatus.textContent = `Counting card ${index + 1} of 11…`;
+      countProgressFill.style.width = `${((index + 1) / 21) * 100}%`;
+      countStatus.textContent = `Turning over card ${index + 1} of 21…`;
 
-      if (index === 10) {
-        countStatus.textContent = "Card 11 — the one in the middle. Found it!";
-        const revealTimer = window.setTimeout(() => showReveal(deck[10]), 850);
-        countTimers.push(revealTimer);
+      if (index === 20) {
+        countStatus.textContent = "All 21 cards are face up. Finding the card in the middle…";
+        const highlightTimer = window.setTimeout(() => {
+          countGrid.children[10].classList.add("is-target");
+          countStatus.textContent = "Card 11 — the one in the middle. Found it!";
+          const revealTimer = window.setTimeout(() => showReveal(deck[10]), 1000);
+          countTimers.push(revealTimer);
+        }, 500);
+        countTimers.push(highlightTimer);
       }
-    }, 260 + index * 330);
+    }, 260 + index * 160);
     countTimers.push(timer);
   });
 }
@@ -381,4 +386,3 @@ renderHeroCards();
 startButton.addEventListener("click", startGame);
 restartButton.addEventListener("click", startGame);
 playAgainButton.addEventListener("click", startGame);
-
