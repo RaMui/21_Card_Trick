@@ -33,20 +33,20 @@ def deal_cards(deck):
 
 
 def play_magic():
-    print("✨ 歡迎來到 21 張牌魔法秀！ ✨")
-    print("程式將隨機發出 21 張牌，請在心中記住其中一張牌。\n")
+    print("✨ Welcome to the 21-Card Trick! ✨")
+    print("The program will deal 21 cards. Silently remember one of them.\n")
     time.sleep(1)
 
     deck = create_deck()
 
     # Play three rounds.
     for round_num in range(1, 4):
-        print(f"--- 第 {round_num} 輪發牌 ---")
+        print(f"--- Round {round_num} ---")
         piles = deal_cards(deck)
 
         # Display the three piles.
         for i in range(3):
-            print(f"第 {i+1} 堆: {' '.join(piles[i])}")
+            print(f"Pile {i+1}: {' '.join(piles[i])}")
 
         print()
 
@@ -54,13 +54,13 @@ def play_magic():
         while True:
             try:
                 choice = int(
-                    input("請輸入你選的牌在哪一堆（輸入 1、2 或 3）: ")
+                    input("Which pile contains your card? Enter 1, 2, or 3: ")
                 )
                 if choice in [1, 2, 3]:
                     break
-                print("輸入錯誤，請輸入 1、2 或 3。")
+                print("Invalid choice. Please enter 1, 2, or 3.")
             except ValueError:
-                print("請輸入有效的數字！")
+                print("Please enter a valid number.")
 
         # Reassemble the deck with the selected pile in the middle.
         selected_pile = piles[choice - 1]
@@ -68,16 +68,16 @@ def play_magic():
 
         # Order: first other pile + selected pile + second other pile.
         deck = other_piles[0] + selected_pile + other_piles[1]
-        print("\n正在收牌中...\n")
+        print("\nCollecting the cards...\n")
         time.sleep(1)
 
     # Reveal the card in the middle of the deck (the 11th card, index 10).
     chosen_card = deck[10]
 
-    print("🔮 魔法運算中，見證奇蹟的時刻到了...")
+    print("🔮 Working some magic... Get ready for the reveal!")
     time.sleep(2)
-    print(f"\n✨ 我知道了！你心裡選的那張牌就是：【 {chosen_card} 】 ✨")
-    print("是不是很神奇呢？")
+    print(f"\n✨ I know your card! It is: [ {chosen_card} ] ✨")
+    print("Pretty amazing, right?")
 
 
 if __name__ == "__main__":
