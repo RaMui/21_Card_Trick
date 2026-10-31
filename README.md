@@ -1,25 +1,32 @@
-# 21 张牌魔术
+# 21-Card Trick
 
-这是一个用 Python 编写的命令行纸牌小游戏。程序随机抽取 21 张牌，玩家默记其中一张，并在三轮发牌后指出它所在的牌堆；程序会利用每轮把目标牌堆放在中间的规则，最终揭晓第 11 张牌。
+A Python command-line card trick that appears to identify one of 21 randomly selected playing cards. The player silently remembers a card, then points out its pile in each of three rounds. After collecting each selected pile between the other two piles, the program reveals the 11th card.
 
-## 运行方式
+## Requirements
 
-需要安装 Python 3。项目只使用 Python 标准库，无需安装额外依赖。
+- Python 3
+- No third-party packages are required.
+
+## Run
 
 ```bash
 python 21_Card_Trick.py
 ```
 
-每轮看到三堆牌后，输入目标牌所在牌堆的编号（1、2 或 3），共进行三轮。
+## How to Play
 
-## 文件
+1. Remember one of the 21 cards shown by the program.
+2. In each round, enter the number of the pile containing your card: `1`, `2`, or `3`.
+3. Repeat for three rounds and let the program reveal your card.
 
-- `21_Card_Trick.py`：生成牌组、发牌、收牌并揭晓结果的主程序。
+## Project File
 
-## 原理说明
+- `21_Card_Trick.py` — creates the deck, deals the cards, and reveals the result.
 
-每轮将 21 张牌平均发成三堆，并把玩家指出的牌堆收在中间。重复三轮后，目标牌会移动到整叠牌的正中间，也就是第 11 张。
+## How It Works
 
-## 维基百科
+The 21 cards are dealt into three piles. After each round, the selected pile is placed between the other two piles. Repeating this process three times moves the chosen card to the middle of the deck, position 11.
 
-[Twenty-One Card Trick](https://en.wikipedia.org/wiki/Twenty-One_Card_Trick)
+## Reference
+
+[Wikipedia: Twenty-One Card Trick](https://en.wikipedia.org/wiki/Twenty-One_Card_Trick)
