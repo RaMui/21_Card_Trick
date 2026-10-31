@@ -9,7 +9,10 @@ const RANKS = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"]
 
 const introPanel = document.querySelector("#intro-panel");
 const gamePanel = document.querySelector("#game-panel");
+const countPanel = document.querySelector("#count-panel");
 const revealPanel = document.querySelector("#reveal-panel");
+const gameTitle = document.querySelector("#game-title");
+const gameInstruction = document.querySelector("#game-instruction");
 const startButton = document.querySelector("#start-button");
 const restartButton = document.querySelector("#restart-button");
 const playAgainButton = document.querySelector("#play-again-button");
@@ -18,11 +21,18 @@ const roundKicker = document.querySelector("#round-kicker");
 const roundNumber = document.querySelector("#round-number");
 const progressFill = document.querySelector("#progress-fill");
 const liveMessage = document.querySelector("#live-message");
+const countGrid = document.querySelector("#count-grid");
+const countCurrent = document.querySelector("#count-current");
+const countProgressFill = document.querySelector("#count-progress-fill");
+const countStatus = document.querySelector("#count-status");
 const revealCard = document.querySelector("#reveal-card");
 
 let deck = [];
 let round = 1;
 let isGathering = false;
+let shuffleTimer = null;
+let dealTimer = null;
+let countTimers = [];
 
 function createDeck() {
   const cards = SUITS.flatMap((suit) =>
@@ -155,6 +165,38 @@ function renderCard(card, className = "card-slot") {
   return slot;
 }
 
+function renderCountCard(card, index) {
+  const item = document.createElement("div");
+  item.className = "count-item";
+  item.setAttribute("role", "listitem");
+  item.setAttribute("aria-label", `Card ${index + 1}`);
+
+  const cardShell = document.createElement("span");
+  cardShell.className = "count-card";
+  const flip = document.createElement("span");
+  flip.className = "count-card-flip";
+
+  const back = document.createElement("span");
+  back.className = "count-card-face count-card-back";
+  const backMark = document.createElement("span");
+  backMark.className = "count-back-mark";
+  backMark.textContent = "21";
+  back.append(backMark);
+
+  const face = document.createElement("span");
+  face.className = "count-card-face count-card-front";
+  face.append(renderCard(card, "count-front-slot"));
+
+  const number = document.createElement("span");
+  number.className = "count-index";
+  number.textContent = String(index + 1).padStart(2, "0");
+
+  flip.append(back, face);
+  cardShell.append(flip);
+  item.append(cardShell, number);
+  return item;
+}
+
 function renderHeroCards() {
   const heroCards = document.querySelector("#hero-cards");
   const samples = [
@@ -166,18 +208,32 @@ function renderHeroCards() {
   samples.forEach((card) => heroCards.append(renderCard(card, "hero-card")));
 }
 
-function renderRound() {
+function renderRound({ animateDeal = false, countAfterDeal = false } = {}) {
   const piles = dealCards(deck);
+  if (dealTimer !== null) {
+    window.clearTimeout(dealTimer);
+    dealTimer = null;
+  }
+  pileBoard.classList.remove("is-gathering", "is-shuffling", "is-dealing");
   roundKicker.textContent = `ROUND ${round} OF 3`;
+  gameTitle.textContent = countAfterDeal
+    ? "The deck is back in three piles."
+    : "Which pile holds your card?";
+  gameInstruction.textContent = countAfterDeal
+    ? "Now we’ll count to the card in the middle."
+    : "Find your card, then choose its pile.";
   roundNumber.textContent = String(round).padStart(2, "0");
   progressFill.style.width = `${(round / 3) * 100}%`;
-  liveMessage.textContent = "Your card is in one of these piles. Take a good look.";
+  liveMessage.textContent = countAfterDeal
+    ? "The three piles are dealt. Counting starts in a moment…"
+    : "Your card is in one of these piles. Take a good look.";
   pileBoard.replaceChildren();
 
   piles.forEach((pile, pileIndex) => {
     const button = document.createElement("button");
     button.type = "button";
     button.className = "pile-choice";
+    button.disabled = countAfterDeal;
     button.setAttribute(
       "aria-label",
       `Pile ${pileIndex + 1}: ${pile.map((card) => `${card.rank}${card.suit}`).join(", ")}`,
@@ -195,43 +251,114 @@ function renderRound() {
     button.addEventListener("click", () => choosePile(pileIndex));
     pileBoard.append(button);
   });
+
+  if (animateDeal) {
+    pileBoard.classList.add("is-dealing");
+    dealTimer = window.setTimeout(() => {
+      pileBoard.classList.remove("is-dealing");
+      dealTimer = null;
+    }, 650);
+  }
 }
 
 function choosePile(pileIndex) {
   if (isGathering) return;
 
+  if (dealTimer !== null) {
+    window.clearTimeout(dealTimer);
+    dealTimer = null;
+  }
   isGathering = true;
+  pileBoard.classList.remove("is-dealing");
+  pileBoard.classList.add("is-gathering");
   const choices = [...pileBoard.querySelectorAll(".pile-choice")];
-  choices.forEach((button, index) => {
+  choices.forEach((button) => {
     button.disabled = true;
-    button.classList.toggle("is-selected", index === pileIndex);
-    button.classList.toggle("is-dimmed", index !== pileIndex);
+    button.classList.remove("is-selected", "is-dimmed", "is-shuffling");
   });
 
-  liveMessage.textContent = `Pile ${pileIndex + 1} selected. Gathering the cards…`;
+  liveMessage.textContent = `Pile ${pileIndex + 1} selected. Gathering all three piles…`;
 
-  window.setTimeout(() => {
-    const piles = dealCards(deck);
-    const selectedPile = piles[pileIndex];
-    const otherPiles = piles.filter((_, index) => index !== pileIndex);
-    deck = [...otherPiles[0], ...selectedPile, ...otherPiles[1]];
+  shuffleTimer = window.setTimeout(() => {
+    shuffleTimer = null;
+    pileBoard.classList.remove("is-gathering");
+    pileBoard.classList.add("is-shuffling");
+    liveMessage.textContent = "All three piles are together. Shuffling the deck…";
 
-    if (round === 3) {
-      showReveal(deck[10]);
-      return;
-    }
+    shuffleTimer = window.setTimeout(() => {
+      shuffleTimer = null;
+      const piles = dealCards(deck);
+      const selectedPile = piles[pileIndex];
+      const otherPiles = piles.filter((_, index) => index !== pileIndex);
+      deck = [...otherPiles[0], ...selectedPile, ...otherPiles[1]];
 
-    round += 1;
-    isGathering = false;
-    renderRound();
-  }, 520);
+      if (round === 3) {
+        isGathering = false;
+        renderRound({ animateDeal: true, countAfterDeal: true });
+        countTimers.push(window.setTimeout(startCounting, 1050));
+        return;
+      }
+
+      round += 1;
+      isGathering = false;
+      renderRound({ animateDeal: true });
+    }, 540);
+  }, 640);
+}
+
+function clearMotionTimers() {
+  if (shuffleTimer !== null) {
+    window.clearTimeout(shuffleTimer);
+    shuffleTimer = null;
+  }
+  if (dealTimer !== null) {
+    window.clearTimeout(dealTimer);
+    dealTimer = null;
+  }
+  countTimers.forEach((timer) => window.clearTimeout(timer));
+  countTimers = [];
+}
+
+function startCounting() {
+  clearMotionTimers();
+  isGathering = false;
+  gamePanel.hidden = true;
+  revealPanel.hidden = true;
+  countPanel.hidden = false;
+  restartButton.hidden = false;
+
+  const firstEleven = deck.slice(0, 11);
+  countGrid.replaceChildren(...firstEleven.map(renderCountCard));
+  countCurrent.textContent = "00";
+  countProgressFill.style.width = "0%";
+  countStatus.textContent = "Counting the cards to find the one in the middle…";
+  countPanel.scrollIntoView({ behavior: "smooth", block: "start" });
+
+  firstEleven.forEach((_, index) => {
+    const timer = window.setTimeout(() => {
+      const item = countGrid.children[index];
+      item.classList.add("is-counted");
+      countCurrent.textContent = String(index + 1).padStart(2, "0");
+      countProgressFill.style.width = `${((index + 1) / 11) * 100}%`;
+      countStatus.textContent = `Counting card ${index + 1} of 11…`;
+
+      if (index === 10) {
+        countStatus.textContent = "Card 11 — the one in the middle. Found it!";
+        const revealTimer = window.setTimeout(() => showReveal(deck[10]), 850);
+        countTimers.push(revealTimer);
+      }
+    }, 260 + index * 330);
+    countTimers.push(timer);
+  });
 }
 
 function startGame() {
+  clearMotionTimers();
   deck = createDeck();
   round = 1;
   isGathering = false;
   introPanel.hidden = true;
+  countPanel.hidden = true;
   revealPanel.hidden = true;
   gamePanel.hidden = false;
   restartButton.hidden = false;
@@ -240,8 +367,10 @@ function startGame() {
 }
 
 function showReveal(card) {
+  clearMotionTimers();
   isGathering = false;
   gamePanel.hidden = true;
+  countPanel.hidden = true;
   revealPanel.hidden = false;
   restartButton.hidden = false;
   revealCard.replaceChildren(renderCard(card, "card-slot"));
