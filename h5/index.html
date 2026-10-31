@@ -31,8 +31,9 @@
             <p class="eyebrow"><span class="eyebrow-line"></span> THREE ROUNDS. ONE CARD.</p>
             <h1>Think of a card.<br /><span>I'll find it.</span></h1>
             <p class="intro-description">
-              Remember any card you see. Tell me which pile it’s in three times,
-              and let a little bit of math do the magic.
+              When the cards appear, silently choose one and keep it in mind.
+              Point out its pile in each of three rounds, and let a little bit of
+              math do the magic.
             </p>
             <button class="primary-button" id="start-button" type="button">
               <span>Start the trick</span><span class="button-arrow" aria-hidden="true">→</span>
@@ -72,7 +73,28 @@
           </p>
         </section>
 
-        <section class="play-surface reveal-panel" id="reveal-panel" hidden>
+        <section class="play-surface count-panel" id="count-panel" hidden>
+          <div class="game-heading">
+            <div>
+              <p class="eyebrow"><span class="eyebrow-line"></span> THE FINAL COUNT</p>
+              <h2>One card at a time.</h2>
+              <p class="game-instruction">After three rounds, your card is waiting in the middle.</p>
+            </div>
+            <div class="round-meter" aria-label="Cards counted">
+              <span class="round-number" id="count-current">00</span>
+              <span class="round-total">/ 11</span>
+            </div>
+          </div>
+
+          <div class="progress-track" aria-hidden="true">
+            <span class="progress-fill" id="count-progress-fill"></span>
+          </div>
+
+          <div class="count-grid" id="count-grid" role="list" aria-label="Counting the first eleven cards"></div>
+          <p class="live-message" id="count-status" aria-live="polite">Shuffling the cards into order…</p>
+        </section>
+
+        <section class="play-surface reveal-panel" id="reveal-panel" aria-live="polite" hidden>
           <div class="reveal-copy">
             <p class="eyebrow"><span class="eyebrow-line"></span> THE MOMENT OF TRUTH</p>
             <h2>Found it.</h2>
