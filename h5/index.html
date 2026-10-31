@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#f4f5ef" />
+    <meta
+      name="description"
+      content="A playful, browser-based version of the 21-card trick."
+    />
+    <title>21-Card Trick</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script src="app.js" defer></script>
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="topbar">
+        <a class="brand" href="#top" aria-label="21-Card Trick home">
+          <span class="brand-mark">21</span>
+          <span class="brand-name">THE CARD TRICK</span>
+        </a>
+        <div class="topbar-note"><span class="live-dot"></span> A LITTLE BROWSER ILLUSION</div>
+        <button class="restart-button" id="restart-button" type="button" hidden>
+          Restart
+        </button>
+      </header>
+
+      <main id="top" class="main-content">
+        <section class="play-surface intro-panel" id="intro-panel">
+          <div class="intro-copy">
+            <p class="eyebrow"><span class="eyebrow-line"></span> THREE ROUNDS. ONE CARD.</p>
+            <h1>Think of a card.<br /><span>I'll find it.</span></h1>
+            <p class="intro-description">
+              Remember any card you see. Tell me which pile it’s in three times,
+              and let a little bit of math do the magic.
+            </p>
+            <button class="primary-button" id="start-button" type="button">
+              <span>Start the trick</span><span class="button-arrow" aria-hidden="true">→</span>
+            </button>
+            <p class="microcopy">No camera, no deck, no funny business. Just 21 cards.</p>
+          </div>
+          <div class="hero-art" aria-hidden="true">
+            <span class="orbit orbit-one"></span>
+            <span class="orbit orbit-two"></span>
+            <div class="hero-cards" id="hero-cards"></div>
+            <div class="hero-stamp"><span>21</span><small>CARDS</small></div>
+          </div>
+        </section>
+
+        <section class="play-surface game-panel" id="game-panel" hidden>
+          <div class="game-heading">
+            <div>
+              <p class="eyebrow" id="round-kicker">ROUND 1 OF 3</p>
+              <h2 id="game-title">Which pile holds your card?</h2>
+              <p class="game-instruction" id="game-instruction">
+                Find your card, then choose its pile.
+              </p>
+            </div>
+            <div class="round-meter" aria-label="Round progress">
+              <span class="round-number" id="round-number">01</span>
+              <span class="round-total">/ 03</span>
+            </div>
+          </div>
+
+          <div class="progress-track" aria-hidden="true">
+            <span class="progress-fill" id="progress-fill"></span>
+          </div>
+
+          <div class="pile-board" id="pile-board" aria-label="Choose the pile containing your card"></div>
+          <p class="live-message" id="live-message" aria-live="polite">
+            Your card is in one of these piles. Take a good look.
+          </p>
+        </section>
+
+        <section class="play-surface reveal-panel" id="reveal-panel" hidden>
+          <div class="reveal-copy">
+            <p class="eyebrow"><span class="eyebrow-line"></span> THE MOMENT OF TRUTH</p>
+            <h2>Found it.</h2>
+            <p class="reveal-description">You were thinking of this card all along.</p>
+            <button class="primary-button" id="play-again-button" type="button">
+              <span>Try another card</span><span class="button-arrow" aria-hidden="true">↻</span>
+            </button>
+          </div>
+          <div class="reveal-card" id="reveal-card" aria-label="Your chosen card"></div>
+        </section>
+      </main>
+
+      <footer class="page-footer">
+        <span>21 cards, 3 piles, a tiny mathematical miracle.</span>
+        <span class="footer-mark">♠ ♥ ♦ ♣</span>
+      </footer>
+    </div>
+  </body>
+</html>
+
