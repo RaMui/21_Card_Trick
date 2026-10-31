@@ -6,6 +6,7 @@ on:
       - h5_version
     paths:
       - "h5/**"
+      - "index.html"
       - ".github/workflows/deploy-h5.yml"
   workflow_dispatch:
 
