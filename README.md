@@ -13,6 +13,10 @@ A Python command-line card trick that appears to identify one of 21 randomly sel
 python 21_Card_Trick.py
 ```
 
+## Browser Version
+
+Open `h5/index.html` in a modern browser to play the responsive H5 version. It uses vanilla JavaScript and inline SVG card faces, with no build step or external dependencies.
+
 ## How to Play
 
 1. Remember one of the 21 cards shown by the program.
@@ -22,6 +26,7 @@ python 21_Card_Trick.py
 ## Project File
 
 - `21_Card_Trick.py` — creates the deck, deals the cards, and reveals the result.
+- `h5/` — browser version of the trick (`index.html`, `styles.css`, and `app.js`).
 
 ## How It Works
 
@@ -30,3 +35,4 @@ The 21 cards are dealt into three piles. After each round, the selected pile is 
 ## Reference
 
 [Wikipedia: Twenty-One Card Trick](https://en.wikipedia.org/wiki/Twenty-One_Card_Trick)
+
