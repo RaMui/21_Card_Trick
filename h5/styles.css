@@ -382,13 +382,16 @@ h1 span {
 }
 
 .pile-board {
+  --board-gap: 14px;
+  --stack-offset: 16px;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 14px;
+  gap: var(--board-gap);
   padding: 24px 0 12px;
 }
 
 .pile-choice {
+  position: relative;
   min-width: 0;
   padding: 12px 10px 16px;
   border: 1px solid #e8ece4;
@@ -420,6 +423,98 @@ h1 span {
 
 .pile-choice.is-dimmed {
   opacity: 0.48;
+}
+
+.pile-board.is-gathering .pile-choice,
+.pile-board.is-shuffling .pile-choice {
+  z-index: 1;
+  transform-origin: center center;
+  transition: transform 580ms cubic-bezier(0.2, 0.78, 0.2, 1),
+    opacity 300ms ease, box-shadow 300ms ease;
+}
+
+.pile-board.is-gathering .pile-choice:nth-child(1),
+.pile-board.is-shuffling .pile-choice:nth-child(1) {
+  z-index: 2;
+  transform: translateX(calc(100% + var(--board-gap) - var(--stack-offset))) scale(0.82) rotate(-7deg);
+}
+
+.pile-board.is-gathering .pile-choice:nth-child(2),
+.pile-board.is-shuffling .pile-choice:nth-child(2) {
+  z-index: 3;
+  transform: scale(0.82) rotate(1deg);
+}
+
+.pile-board.is-gathering .pile-choice:nth-child(3),
+.pile-board.is-shuffling .pile-choice:nth-child(3) {
+  z-index: 1;
+  transform: translateX(calc(-100% - var(--board-gap) + var(--stack-offset))) scale(0.82) rotate(7deg);
+}
+
+.pile-board.is-gathering .pile-heading,
+.pile-board.is-shuffling .pile-heading {
+  opacity: 0;
+  transition: opacity 220ms ease;
+}
+
+.pile-board.is-shuffling .pile-choice:nth-child(1) {
+  animation: shuffle-stack-left 520ms ease-in-out both;
+}
+
+.pile-board.is-shuffling .pile-choice:nth-child(2) {
+  animation: shuffle-stack-center 520ms ease-in-out both;
+}
+
+.pile-board.is-shuffling .pile-choice:nth-child(3) {
+  animation: shuffle-stack-right 520ms ease-in-out both;
+}
+
+@keyframes shuffle-stack-left {
+  0%,
+  100% { transform: translateX(calc(100% + var(--board-gap) - var(--stack-offset))) scale(0.82) rotate(-7deg); }
+  35% { transform: translateX(calc(100% + var(--board-gap) - var(--stack-offset) - 8px)) translateY(-8px) scale(0.82) rotate(-11deg); }
+  68% { transform: translateX(calc(100% + var(--board-gap) - var(--stack-offset) + 6px)) translateY(3px) scale(0.82) rotate(-2deg); }
+}
+
+@keyframes shuffle-stack-center {
+  0%,
+  100% { transform: scale(0.82) rotate(1deg); }
+  30% { transform: translateY(-9px) scale(0.82) rotate(-3deg); }
+  62% { transform: translateY(4px) scale(0.82) rotate(4deg); }
+}
+
+@keyframes shuffle-stack-right {
+  0%,
+  100% { transform: translateX(calc(-100% - var(--board-gap) + var(--stack-offset))) scale(0.82) rotate(7deg); }
+  35% { transform: translateX(calc(-100% - var(--board-gap) + var(--stack-offset) + 8px)) translateY(3px) scale(0.82) rotate(11deg); }
+  68% { transform: translateX(calc(-100% - var(--board-gap) + var(--stack-offset) - 6px)) translateY(-4px) scale(0.82) rotate(3deg); }
+}
+
+.pile-board.is-dealing .pile-choice:nth-child(1) {
+  animation: deal-pile-left 620ms cubic-bezier(0.2, 0.78, 0.2, 1) both;
+}
+
+.pile-board.is-dealing .pile-choice:nth-child(2) {
+  animation: deal-pile-center 620ms cubic-bezier(0.2, 0.78, 0.2, 1) both;
+}
+
+.pile-board.is-dealing .pile-choice:nth-child(3) {
+  animation: deal-pile-right 620ms cubic-bezier(0.2, 0.78, 0.2, 1) both;
+}
+
+@keyframes deal-pile-left {
+  from { opacity: 0.6; transform: translateX(calc(100% + var(--board-gap) - var(--stack-offset))) scale(0.82) rotate(-7deg); }
+  to { opacity: 1; transform: translateX(0) scale(1) rotate(0); }
+}
+
+@keyframes deal-pile-center {
+  from { opacity: 0.7; transform: scale(0.82) rotate(1deg); }
+  to { opacity: 1; transform: scale(1) rotate(0); }
+}
+
+@keyframes deal-pile-right {
+  from { opacity: 0.6; transform: translateX(calc(-100% - var(--board-gap) + var(--stack-offset))) scale(0.82) rotate(7deg); }
+  to { opacity: 1; transform: translateX(0) scale(1) rotate(0); }
 }
 
 .pile-heading {
@@ -474,6 +569,118 @@ h1 span {
   color: #7b877f;
   font-size: 12px;
   text-align: center;
+}
+
+.count-panel {
+  padding: 42px 42px 28px;
+}
+
+.count-grid {
+  display: grid;
+  grid-template-columns: repeat(11, minmax(0, 1fr));
+  align-items: start;
+  gap: 10px;
+  padding: 28px 0 8px;
+}
+
+.count-item {
+  min-width: 0;
+  text-align: center;
+}
+
+.count-card {
+  display: block;
+  width: 100%;
+  aspect-ratio: 120 / 164;
+  perspective: 800px;
+}
+
+.count-card-flip {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 9px;
+  transform-style: preserve-3d;
+  transition: transform 420ms cubic-bezier(0.2, 0.75, 0.2, 1);
+}
+
+.count-item.is-counted .count-card-flip {
+  transform: rotateY(180deg);
+}
+
+.count-card-face {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border: 1px solid #dfe5db;
+  border-radius: 9px;
+  backface-visibility: hidden;
+}
+
+.count-card-back {
+  display: grid;
+  place-items: center;
+  border: 4px solid #fffefa;
+  outline: 1px solid #dfe5db;
+  color: #f5f7ed;
+  background:
+    repeating-linear-gradient(45deg, transparent 0 5px, rgba(216, 238, 157, 0.3) 5px 7px),
+    repeating-linear-gradient(-45deg, transparent 0 7px, rgba(255, 255, 255, 0.12) 7px 9px),
+    #28654f;
+}
+
+.count-card-back::before {
+  position: absolute;
+  inset: 5px;
+  border: 1px solid rgba(246, 249, 236, 0.65);
+  border-radius: 5px;
+  content: "";
+}
+
+.count-back-mark {
+  display: grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  border: 1px solid rgba(246, 249, 236, 0.8);
+  border-radius: 50%;
+  color: #f6f8ed;
+  font-family: Georgia, serif;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.count-card-front {
+  transform: rotateY(180deg);
+}
+
+.count-front-slot {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.count-front-slot .playing-card-svg {
+  width: 100%;
+  height: 100%;
+}
+
+.count-index {
+  display: inline-block;
+  margin-top: 7px;
+  color: #98a39a;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.count-item.is-counted .count-index {
+  color: var(--green);
+}
+
+.count-item:last-child.is-counted .count-index {
+  color: #9b7629;
 }
 
 .reveal-panel {
@@ -581,12 +788,29 @@ h1 span {
     padding: 28px 14px 20px;
   }
 
+  .count-panel {
+    padding: 28px 14px 20px;
+  }
+
+  .count-grid {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 10px 8px;
+    padding-top: 22px;
+  }
+
+  .count-card {
+    max-width: 66px;
+    margin: 0 auto;
+  }
+
   .game-heading {
     padding: 0 7px 20px;
   }
 
   .pile-board {
-    gap: 7px;
+    --board-gap: 7px;
+    --stack-offset: 10px;
+    gap: var(--board-gap);
     padding-top: 17px;
   }
 
@@ -656,7 +880,9 @@ h1 span {
   }
 
   .pile-board {
-    gap: 5px;
+    --board-gap: 5px;
+    --stack-offset: 8px;
+    gap: var(--board-gap);
   }
 }
 
