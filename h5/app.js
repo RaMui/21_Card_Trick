@@ -26,6 +26,9 @@ const countCurrent = document.querySelector("#count-current");
 const countProgressFill = document.querySelector("#count-progress-fill");
 const countStatus = document.querySelector("#count-status");
 const revealCard = document.querySelector("#reveal-card");
+const languageSelect = document.querySelector("#language-select");
+
+window.I18n.init();
 
 let deck = [];
 let round = 1;
@@ -33,6 +36,30 @@ let isGathering = false;
 let shuffleTimer = null;
 let dealTimer = null;
 let countTimers = [];
+let currentPiles = [];
+let gameMessageKey = "liveLook";
+let gameMessageValues = {};
+let countedCards = 0;
+let countPhase = "initial";
+let revealedCard = null;
+
+const SUIT_LABEL_KEYS = {
+  "♠": "suitSpades",
+  "♥": "suitHearts",
+  "♦": "suitDiamonds",
+  "♣": "suitClubs",
+};
+
+function translate(key, values = {}) {
+  return window.I18n.t(key, values);
+}
+
+function getCardLabel(card) {
+  return translate("cardLabel", {
+    rank: card.rank,
+    suit: translate(SUIT_LABEL_KEYS[card.suit]),
+  });
+}
 
 function createDeck() {
   const cards = SUITS.flatMap((suit) =>
@@ -59,7 +86,9 @@ function createCardSvg(card) {
     class: "playing-card-svg",
     viewBox: "0 0 120 164",
     role: "img",
-    "aria-label": `${card.rank} of ${card.suit}`,
+    "aria-label": getCardLabel(card),
+    "data-card-rank": card.rank,
+    "data-card-suit": card.suit,
   });
 
   svg.append(
@@ -179,7 +208,8 @@ function renderCountCard(card, index) {
   const item = document.createElement("div");
   item.className = "count-item";
   item.setAttribute("role", "listitem");
-  item.setAttribute("aria-label", `Card ${index + 1}`);
+  item.dataset.cardNumber = String(index + 1);
+  item.setAttribute("aria-label", translate("cardNumberLabel", { number: index + 1 }));
 
   const cardShell = document.createElement("span");
   cardShell.className = "count-card";
@@ -220,34 +250,37 @@ function renderHeroCards() {
 
 function renderRound({ animateDeal = false } = {}) {
   const piles = dealCards(deck);
+  currentPiles = piles;
   if (dealTimer !== null) {
     window.clearTimeout(dealTimer);
     dealTimer = null;
   }
   pileBoard.classList.remove("is-gathering", "is-shuffling", "is-dealing");
-  roundKicker.textContent = `ROUND ${round} OF 3`;
-  gameTitle.textContent = "Which pile holds your card?";
-  gameInstruction.textContent = "Find your card, then choose its pile.";
+  roundKicker.textContent = translate("roundKicker", { round });
+  gameTitle.textContent = translate("gameTitle");
+  gameInstruction.textContent = translate("gameInstruction");
   roundNumber.textContent = String(round).padStart(2, "0");
   progressFill.style.width = `${(round / 3) * 100}%`;
-  liveMessage.textContent = "Your card is in one of these piles. Take a good look.";
+  setGameMessage("liveLook");
   pileBoard.replaceChildren();
 
   piles.forEach((pile, pileIndex) => {
     const button = document.createElement("button");
     button.type = "button";
     button.className = "pile-choice";
-    button.setAttribute(
-      "aria-label",
-      `Pile ${pileIndex + 1}: ${pile.map((card) => `${card.rank}${card.suit}`).join(", ")}`,
-    );
     button.innerHTML = `
       <span class="pile-heading">
-        <span class="pile-name">Pile ${pileIndex + 1}</span>
-        <span class="pile-count">7 CARDS</span>
+        <span class="pile-name"></span>
+        <span class="pile-count"></span>
       </span>
       <span class="pile-cards"></span>
     `;
+    button.querySelector(".pile-name").textContent = translate("pileName", { number: pileIndex + 1 });
+    button.querySelector(".pile-count").textContent = translate("pileCount");
+    button.setAttribute("aria-label", translate("pileAria", {
+      number: pileIndex + 1,
+      cards: pile.map(getCardLabel).join(", "),
+    }));
 
     const cardContainer = button.querySelector(".pile-cards");
     pile.forEach((card) => cardContainer.append(renderCard(card)));
@@ -261,6 +294,71 @@ function renderRound({ animateDeal = false } = {}) {
       pileBoard.classList.remove("is-dealing");
       dealTimer = null;
     }, 650);
+  }
+}
+
+function setGameMessage(key, values = {}) {
+  gameMessageKey = key;
+  gameMessageValues = values;
+  liveMessage.textContent = translate(key, values);
+}
+
+function updateCountStatus() {
+  if (countPhase === "initial") {
+    countStatus.textContent = translate("countInitial");
+  } else if (countPhase === "counting") {
+    countStatus.textContent = translate("countingCard", { number: countedCards });
+  } else if (countPhase === "finding") {
+    countStatus.textContent = translate("countFinding");
+  } else if (countPhase === "found") {
+    countStatus.textContent = translate("targetFound");
+  }
+}
+
+function refreshCardLabels() {
+  document.querySelectorAll(".playing-card-svg[data-card-rank]").forEach((svg) => {
+    svg.setAttribute("aria-label", getCardLabel({
+      rank: svg.dataset.cardRank,
+      suit: svg.dataset.cardSuit,
+    }));
+  });
+  countGrid.querySelectorAll(".count-item[data-card-number]").forEach((item) => {
+    item.setAttribute(
+      "aria-label",
+      translate("cardNumberLabel", { number: item.dataset.cardNumber }),
+    );
+  });
+}
+
+function refreshPileLabels() {
+  currentPiles.forEach((pile, pileIndex) => {
+    const button = pileBoard.children[pileIndex];
+    if (!button) return;
+
+    button.querySelector(".pile-name").textContent = translate("pileName", { number: pileIndex + 1 });
+    button.querySelector(".pile-count").textContent = translate("pileCount");
+    button.setAttribute("aria-label", translate("pileAria", {
+      number: pileIndex + 1,
+      cards: pile.map(getCardLabel).join(", "),
+    }));
+  });
+}
+
+function refreshLanguageDependentState() {
+  refreshCardLabels();
+  refreshPileLabels();
+
+  if (!gamePanel.hidden) {
+    roundKicker.textContent = translate("roundKicker", { round });
+    gameTitle.textContent = translate("gameTitle");
+    gameInstruction.textContent = translate("gameInstruction");
+    liveMessage.textContent = translate(gameMessageKey, gameMessageValues);
+  }
+
+  if (!countPanel.hidden) updateCountStatus();
+
+  if (!revealPanel.hidden && revealedCard) {
+    revealCard.replaceChildren(renderCard(revealedCard, "card-slot"));
   }
 }
 
@@ -281,13 +379,13 @@ function choosePile(pileIndex) {
     button.classList.remove("is-selected", "is-dimmed", "is-shuffling");
   });
 
-  liveMessage.textContent = `Pile ${pileIndex + 1} selected. Gathering all three piles…`;
+  setGameMessage("pileSelected", { number: pileIndex + 1 });
 
   shuffleTimer = window.setTimeout(() => {
     shuffleTimer = null;
     pileBoard.classList.remove("is-gathering");
     pileBoard.classList.add("is-shuffling");
-    liveMessage.textContent = "All three piles are together. Shuffling the deck…";
+    setGameMessage("shuffling");
 
     shuffleTimer = window.setTimeout(() => {
       shuffleTimer = null;
@@ -331,22 +429,26 @@ function startCounting() {
   countGrid.replaceChildren(...allCards.map(renderCountCard));
   countCurrent.textContent = "00";
   countProgressFill.style.width = "0%";
-  countStatus.textContent = "Turning over all 21 cards…";
+  countedCards = 0;
+  countPhase = "initial";
+  updateCountStatus();
   countPanel.scrollIntoView({ behavior: "smooth", block: "start" });
 
   allCards.forEach((_, index) => {
     const timer = window.setTimeout(() => {
       const item = countGrid.children[index];
       item.classList.add("is-counted");
-      countCurrent.textContent = String(index + 1).padStart(2, "0");
-      countProgressFill.style.width = `${((index + 1) / 21) * 100}%`;
-      countStatus.textContent = `Turning over card ${index + 1} of 21…`;
+      countedCards = index + 1;
+      countCurrent.textContent = String(countedCards).padStart(2, "0");
+      countProgressFill.style.width = `${(countedCards / 21) * 100}%`;
+      countPhase = index === 20 ? "finding" : "counting";
+      updateCountStatus();
 
       if (index === 20) {
-        countStatus.textContent = "All 21 cards are face up. Finding the card in the middle…";
         const highlightTimer = window.setTimeout(() => {
           countGrid.children[10].classList.add("is-target");
-          countStatus.textContent = "Card 11 — the one in the middle. Found it!";
+          countPhase = "found";
+          updateCountStatus();
           const revealTimer = window.setTimeout(() => showReveal(deck[10]), 1000);
           countTimers.push(revealTimer);
         }, 500);
@@ -362,6 +464,7 @@ function startGame() {
   deck = createDeck();
   round = 1;
   isGathering = false;
+  revealedCard = null;
   introPanel.hidden = true;
   countPanel.hidden = true;
   revealPanel.hidden = true;
@@ -378,11 +481,16 @@ function showReveal(card) {
   countPanel.hidden = true;
   revealPanel.hidden = false;
   restartButton.hidden = false;
+  revealedCard = card;
   revealCard.replaceChildren(renderCard(card, "card-slot"));
   revealPanel.scrollIntoView({ behavior: "smooth", block: "center" });
 }
 
 renderHeroCards();
+languageSelect.addEventListener("change", () => {
+  window.I18n.setLocale(languageSelect.value);
+});
+document.addEventListener("app-language-change", refreshLanguageDependentState);
 startButton.addEventListener("click", startGame);
 restartButton.addEventListener("click", startGame);
 playAgainButton.addEventListener("click", startGame);

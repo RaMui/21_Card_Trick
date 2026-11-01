@@ -97,6 +97,44 @@ a:focus-visible {
   color: #77817a;
 }
 
+.topbar-tools {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.language-control {
+  display: inline-flex;
+  align-items: center;
+}
+
+.language-select {
+  max-width: 150px;
+  padding: 9px 30px 9px 12px;
+  border: 1px solid #dce3d8;
+  border-radius: 999px;
+  color: var(--green-dark);
+  background: rgba(255, 255, 255, 0.8);
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.language-select:focus-visible {
+  outline: 3px solid #a2c763;
+  outline-offset: 3px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  clip-path: inset(50%);
+}
+
 .live-dot {
   width: 7px;
   height: 7px;
@@ -767,10 +805,26 @@ h1 span {
 
   .topbar {
     min-height: 72px;
+    gap: 10px;
   }
 
   .topbar-note {
     display: none;
+  }
+
+  .topbar-tools {
+    gap: 6px;
+  }
+
+  .language-select {
+    max-width: 124px;
+    padding: 8px 25px 8px 9px;
+    font-size: 11px;
+  }
+
+  .restart-button {
+    padding: 9px 11px;
+    font-size: 11px;
   }
 
   .main-content {
@@ -895,6 +949,10 @@ h1 span {
 }
 
 @media (max-width: 390px) {
+  .brand-name {
+    display: none;
+  }
+
   .pile-name {
     font-size: 8px;
   }

@@ -8,6 +8,8 @@ A browser-based card trick that appears to identify one of 21 randomly selected 
 
 Open `h5/index.html` in a modern browser to play the responsive H5 version. It uses vanilla JavaScript and inline SVG card faces, with no build step or external dependencies.
 
+The interface defaults to English and can be switched to Simplified Chinese, Traditional Chinese, Japanese, or Korean.
+
 The core card-trick logic is based on the `python_version` branch; this version adds a front-end interface to demonstrate the trick in the browser.
 
 ## How to Play
@@ -18,7 +20,7 @@ The core card-trick logic is based on the `python_version` branch; this version 
 
 ## Project File
 
-- `h5/` — browser version of the trick (`index.html`, `styles.css`, and `app.js`).
+- `h5/` — browser version of the trick (`index.html`, `styles.css`, `app.js`, and `i18n.js`).
 
 ## How It Works
 

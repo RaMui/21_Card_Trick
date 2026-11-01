@@ -10,41 +10,52 @@
     />
     <title>21-Card Trick</title>
     <link rel="stylesheet" href="styles.css" />
+    <script src="i18n.js" defer></script>
     <script src="app.js" defer></script>
   </head>
   <body>
     <div class="page-shell">
       <header class="topbar">
-        <a class="brand" href="#top" aria-label="21-Card Trick home">
+        <a class="brand" href="#top" aria-label="21-Card Trick home" data-i18n-aria-label="homeLabel">
           <span class="brand-mark">21</span>
-          <span class="brand-name">THE CARD TRICK</span>
+          <span class="brand-name" data-i18n="brand">THE CARD TRICK</span>
         </a>
-        <div class="topbar-note"><span class="live-dot"></span> A LITTLE BROWSER ILLUSION</div>
-        <button class="restart-button" id="restart-button" type="button" hidden>
-          Restart
-        </button>
+        <div class="topbar-note"><span class="live-dot"></span> <span data-i18n="tagline">A LITTLE BROWSER ILLUSION</span></div>
+        <div class="topbar-tools">
+          <label class="language-control">
+            <span class="sr-only" data-i18n="languageLabel">Language</span>
+            <select id="language-select" aria-label="Language" data-i18n-aria-label="languageLabel">
+              <option value="en">English</option>
+              <option value="zh-CN">简体中文</option>
+              <option value="zh-TW">繁體中文</option>
+              <option value="ja">日本語</option>
+              <option value="ko">한국어</option>
+            </select>
+          </label>
+          <button class="restart-button" id="restart-button" type="button" data-i18n="restart" hidden>
+            Restart
+          </button>
+        </div>
       </header>
 
       <main id="top" class="main-content">
         <section class="play-surface intro-panel" id="intro-panel">
           <div class="intro-copy">
-            <p class="eyebrow"><span class="eyebrow-line"></span> THREE ROUNDS. ONE CARD.</p>
-            <h1>Think of a card.<br /><span>I'll find it.</span></h1>
-            <p class="intro-description">
-              When the cards appear, silently choose one and keep it in mind.
-              Point out its pile in each of three rounds, and let a little bit of
-              math do the magic.
+            <p class="eyebrow"><span class="eyebrow-line"></span><span data-i18n="heroEyebrow">THREE ROUNDS. ONE CARD.</span></p>
+            <h1><span data-i18n="heroTitleFirst">Think of a card.</span><br /><span data-i18n="heroTitleSecond">I'll find it.</span></h1>
+            <p class="intro-description" data-i18n="introDescription">
+              When the cards appear, silently choose one and keep it in mind. Point out its pile in each of three rounds, and let a little bit of math do the magic.
             </p>
             <button class="primary-button" id="start-button" type="button">
-              <span>Start the trick</span><span class="button-arrow" aria-hidden="true">→</span>
+              <span data-i18n="start">Start the trick</span><span class="button-arrow" aria-hidden="true">→</span>
             </button>
-            <p class="microcopy">No camera, no deck, no funny business. Just 21 cards.</p>
+            <p class="microcopy" data-i18n="introMicrocopy">No camera, no deck, no funny business. Just 21 cards.</p>
           </div>
           <div class="hero-art" aria-hidden="true">
             <span class="orbit orbit-one"></span>
             <span class="orbit orbit-two"></span>
             <div class="hero-cards" id="hero-cards"></div>
-            <div class="hero-stamp"><span>21</span><small>CARDS</small></div>
+            <div class="hero-stamp"><span>21</span><small data-i18n="heroCards">CARDS</small></div>
           </div>
         </section>
 
@@ -52,12 +63,12 @@
           <div class="game-heading">
             <div>
               <p class="eyebrow" id="round-kicker">ROUND 1 OF 3</p>
-              <h2 id="game-title">Which pile holds your card?</h2>
-              <p class="game-instruction" id="game-instruction">
+              <h2 id="game-title" data-i18n="gameTitle">Which pile holds your card?</h2>
+              <p class="game-instruction" id="game-instruction" data-i18n="gameInstruction">
                 Find your card, then choose its pile.
               </p>
             </div>
-            <div class="round-meter" aria-label="Round progress">
+            <div class="round-meter" aria-label="Round progress" data-i18n-aria-label="roundProgress">
               <span class="round-number" id="round-number">01</span>
               <span class="round-total">/ 03</span>
             </div>
@@ -67,8 +78,8 @@
             <span class="progress-fill" id="progress-fill"></span>
           </div>
 
-          <div class="pile-board" id="pile-board" aria-label="Choose the pile containing your card"></div>
-          <p class="live-message" id="live-message" aria-live="polite">
+          <div class="pile-board" id="pile-board" aria-label="Choose the pile containing your card" data-i18n-aria-label="pileBoardLabel"></div>
+          <p class="live-message" id="live-message" aria-live="polite" data-i18n="liveLook">
             Your card is in one of these piles. Take a good look.
           </p>
         </section>
@@ -76,11 +87,11 @@
         <section class="play-surface count-panel" id="count-panel" hidden>
           <div class="game-heading">
             <div>
-              <p class="eyebrow"><span class="eyebrow-line"></span> THE FINAL COUNT</p>
-              <h2>One card at a time.</h2>
-              <p class="game-instruction">All 21 cards will turn face up. Your card is the one in the middle.</p>
+              <p class="eyebrow"><span class="eyebrow-line"></span><span data-i18n="finalCount">THE FINAL COUNT</span></p>
+              <h2 data-i18n="oneAtTime">One card at a time.</h2>
+              <p class="game-instruction" data-i18n="finalInstruction">All 21 cards will turn face up. Your card is the one in the middle.</p>
             </div>
-            <div class="round-meter" aria-label="Cards counted">
+            <div class="round-meter" aria-label="Cards counted" data-i18n-aria-label="cardsCounted">
               <span class="round-number" id="count-current">00</span>
               <span class="round-total">/ 21</span>
             </div>
@@ -90,25 +101,25 @@
             <span class="progress-fill" id="count-progress-fill"></span>
           </div>
 
-          <div class="count-grid" id="count-grid" role="list" aria-label="Revealing all twenty-one cards"></div>
-          <p class="live-message" id="count-status" aria-live="polite">Turning over all 21 cards…</p>
+          <div class="count-grid" id="count-grid" role="list" aria-label="Revealing all twenty-one cards" data-i18n-aria-label="countGridLabel"></div>
+          <p class="live-message" id="count-status" aria-live="polite" data-i18n="countInitial">Turning over all 21 cards…</p>
         </section>
 
         <section class="play-surface reveal-panel" id="reveal-panel" aria-live="polite" hidden>
           <div class="reveal-copy">
-            <p class="eyebrow"><span class="eyebrow-line"></span> THE MOMENT OF TRUTH</p>
-            <h2>Found it.</h2>
-            <p class="reveal-description">You were thinking of this card all along.</p>
+            <p class="eyebrow"><span class="eyebrow-line"></span><span data-i18n="momentOfTruth">THE MOMENT OF TRUTH</span></p>
+            <h2 data-i18n="foundIt">Found it.</h2>
+            <p class="reveal-description" data-i18n="revealDescription">You were thinking of this card all along.</p>
             <button class="primary-button" id="play-again-button" type="button">
-              <span>Try another card</span><span class="button-arrow" aria-hidden="true">↻</span>
+              <span data-i18n="playAgain">Try another card</span><span class="button-arrow" aria-hidden="true">↻</span>
             </button>
           </div>
-          <div class="reveal-card" id="reveal-card" aria-label="Your chosen card"></div>
+          <div class="reveal-card" id="reveal-card" aria-label="Your chosen card" data-i18n-aria-label="chosenCard"></div>
         </section>
       </main>
 
       <footer class="page-footer">
-        <span>21 cards, 3 piles, a tiny mathematical miracle.</span>
+        <span data-i18n="footerTagline">21 cards, 3 piles, a tiny mathematical miracle.</span>
         <span class="footer-mark">♠ ♥ ♦ ♣</span>
       </footer>
     </div>
